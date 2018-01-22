@@ -24,6 +24,7 @@ public class RssFeedProvider extends AsyncTask<Void, Void, List<RssItem>> {
     Context context;
     ProgressDialog progressDialog;
     private String urlString = "http://feeds.feedburner.com/blogspot/AndroidDevelopersBackstage?format=xml";
+    private String thumbnailUri;
     URL url;
     private static final String ns = null;
 
@@ -94,9 +95,13 @@ public class RssFeedProvider extends AsyncTask<Void, Void, List<RssItem>> {
                             list.add(item);
                         }else if (currentTagName.equals("content")){
                            // item.setUrl(parser.getText());
-                            urlString = readLink(parser);
-                            item.setUrl(urlString);
+                            urlString = readAudioLink(parser);
+                            item.setAudioUrl(urlString);
+                        }else if (currentTagName.equals("thumbnail")&& inItemTag) {
+                            thumbnailUri = readThumnailUri(parser);
+                            item.setThumbnailUri(thumbnailUri);
                         }
+
 //                        if (currentTagName.equals("media")){
 //                            System.out.print(parser.getText());
 //                        }
@@ -128,8 +133,11 @@ public class RssFeedProvider extends AsyncTask<Void, Void, List<RssItem>> {
                                         item.setSummary(text);
                                         break;
                                     case "media":
-                                        item.setUrl(readLink(parser));
+                                        item.setAudioUrl(readAudioLink(parser));
                                         //item.setUrl(text);
+                                        break;
+                                    case "link":
+                                        item.setPageLink(text);
                                         break;
                                     default:
                                         break;
@@ -176,27 +184,37 @@ public class RssFeedProvider extends AsyncTask<Void, Void, List<RssItem>> {
     private RssItem readEntry(XmlPullParser parser) throws  XmlPullParserException, IOException {
         parser.require(XmlPullParser.START_TAG, ns, "item");
         String title = null;
-        String link = null;
+        String audioLink = null;
         while (parser.next() != XmlPullParser.START_TAG){
             continue;
         }
         String name = parser.getName();
         if (name.equals("enclosure")){//enclosure is where the audio link is located
-            link = readLink(parser);
+            audioLink = readAudioLink(parser);
         }
         return new RssItem();
     }
-    private String readLink(XmlPullParser parser) throws IOException, XmlPullParserException {
-        String link = "";
+    private String readAudioLink(XmlPullParser parser) throws IOException, XmlPullParserException {
+        String audioLink = "";
         parser.require(XmlPullParser.START_TAG, ns, "content");
         String tag = parser.getName();
-        link = parser.getAttributeValue(null, "url");
-
+        audioLink = parser.getAttributeValue(null, "url");
 
         parser.nextTag();
         parser.require(XmlPullParser.END_TAG, ns, "content");
-        return link;
+        return audioLink;
     }
+
+    private String readThumnailUri(XmlPullParser parser) throws IOException, XmlPullParserException {
+        String thumbLink = "";
+        parser.require(XmlPullParser.START_TAG, ns, "thumbnail");
+        String tag = parser.getName();
+        thumbLink = parser.getAttributeValue(null, "url");
+        parser.nextTag();
+        parser.require(XmlPullParser.END_TAG, ns, "thumbnail");
+        return thumbLink;
+    }
+
     @Override
     protected void onPostExecute(List<RssItem> items) {
         super.onPostExecute(items);

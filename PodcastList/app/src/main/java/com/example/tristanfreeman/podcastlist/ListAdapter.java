@@ -4,11 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -17,7 +22,7 @@ import java.util.ArrayList;
  */
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
-    private ArrayList<RssItem> items;
+    public ArrayList<RssItem> items;
     private int rowLayout;
     private Context context;
 
@@ -25,6 +30,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         this.items = list;
         this.rowLayout = rowLayout;
         this.context = context;
+    }
+    public interface ListItemClickListener {
+        public void onListItemClick(RssItem item);
     }
 
     @Override
@@ -42,17 +50,23 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         final RssItem currentItem = items.get(position);
 
+        Picasso.with(context).load("http://storage.googleapis.com/androiddevelopers/android_developers_backstage/adb.png").into(holder.thumbnail);
+        //holder.thumbnail.setImageBitmap(Picasso.with(context).load(currentItem.getThumbnailUri()));
         holder.title.setText(currentItem.getTitle());
-        holder.link.setText(currentItem.getLink());
-        holder.link.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent playIntent = new Intent(Intent.ACTION_VIEW);
-                playIntent.setData(Uri.parse(currentItem.getLink()));
-                context.startActivity(playIntent);
+        holder.pubDate.setText(currentItem.getPubDate());
 
-            }
-        });
+        Spanned result = Html.fromHtml(currentItem.getSummary());
+        holder.description.setText(result);
+        //holder.link.setText(currentItem.getPageLink());
+//        holder.link.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent playIntent = new Intent(Intent.ACTION_VIEW);
+//                playIntent.setData(Uri.parse(currentItem.getLink()));
+//                context.startActivity(playIntent);
+//
+//            }
+//        });
     }
 
     @Override
@@ -60,17 +74,34 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
         return items.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView title;
         TextView description;
-        ImageView image;
+        ImageView thumbnail;
         TextView link;
+        TextView pubDate;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
+            thumbnail = (ImageView)itemView.findViewById(R.id.thumbnail);
             title = (TextView)itemView.findViewById(R.id.title);
-            link = (TextView)itemView.findViewById(R.id.link);
+            pubDate = (TextView)itemView.findViewById(R.id.pubDate);
+            //link = (TextView)itemView.findViewById(R.id.link);
+            description = (TextView)itemView.findViewById(R.id.description);
+            description.setMovementMethod(new ScrollingMovementMethod());
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+            int position = getAdapterPosition();
+            RssItem item = items.get(position);
+
+            Intent playIntent = new Intent(Intent.ACTION_VIEW);
+            playIntent.setDataAndType(Uri.parse(item.getAudioUrl()), "audio/mp3");
+            context.startActivity(playIntent);
         }
     }
+
 }

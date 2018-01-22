@@ -6,19 +6,20 @@ package com.example.tristanfreeman.podcastlist;
 
 public class RssItem {
     private String title;
-    private String link;
+    private String pageLink;
     private String description;
     private String pubDate;
-    private String url;
+    private String audioUrl;
     private String summary;
+    private String thumbnailUri;
 
     public RssItem(){
 
     }
 
-    public RssItem(String title, String link) {
+    public RssItem(String title, String pageLink) {
         this.title = title;
-        this.link = link;
+        this.pageLink = pageLink;
     }
 
     public String getPubDate() {
@@ -36,11 +37,11 @@ public class RssItem {
         this.description = description;
     }
 
-    public String getLink() {
-        return link;
+    public String getPageLink() {
+        return pageLink;
     }
-    public void setLink(String link) {
-        this.link = link;
+    public void setPageLink(String pageLink) {
+        this.pageLink = pageLink;
     }
 
     public String getTitle() {
@@ -50,11 +51,11 @@ public class RssItem {
         this.title = title;
     }
 
-    public String getUrl() {
-        return url;
+    public String getAudioUrl() {
+        return audioUrl;
     }
-    public void setUrl(String url) {
-        this.url = url;
+    public void setAudioUrl(String audioUrl) {
+        this.audioUrl = audioUrl;
     }
 
     public String getSummary(){
@@ -63,6 +64,14 @@ public class RssItem {
     public void setSummary(String summary) {
         this.summary = summary;
     }
+
+    public String getThumbnailUri() {
+        return thumbnailUri;
+    }
+    public void setThumbnailUri(String thumbnailUri) {
+        this.thumbnailUri = thumbnailUri;
+    }
+
     @Override
     public String toString() {
         return "RssItem [title=" + title + "]";

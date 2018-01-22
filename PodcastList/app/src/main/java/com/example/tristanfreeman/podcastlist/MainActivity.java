@@ -72,6 +72,13 @@ private String url = "http://feeds.feedburner.com/blogspot/AndroidDevelopersBack
     }
 
 
+//    public void onListItemClick(RssItem item) {
+//        Intent playIntent = new Intent(Intent.ACTION_VIEW);
+//        playIntent.setData(Uri.parse(item.getAudioUrl()));
+//        startActivity(playIntent);
+//    }
+
+
 }
 
 
